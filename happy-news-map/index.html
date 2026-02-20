@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HappyNews — Good stories from around the world</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo">
+        <span class="logo-sun">☀️</span>
+        <span class="logo-text">Happy<strong>News</strong></span>
+      </div>
+    </div>
+    <div class="header-center">
+      <div class="search-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search happy news...">
+        <button class="search-clear hidden" id="searchClear">✕</button>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" id="refreshBtn" title="Refresh news">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" title="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Category Navigation -->
+  <nav class="category-nav">
+    <div class="nav-scroll">
+      <button class="nav-pill active" data-section="all">✨ For You</button>
+      <button class="nav-pill map-pill" data-section="map">🗺️ Map View</button>
+      <button class="nav-pill" data-section="science">🔬 Science</button>
+      <button class="nav-pill" data-section="technology">💻 Technology</button>
+      <button class="nav-pill" data-section="culture">🎭 Culture</button>
+      <button class="nav-pill" data-section="sport">🏆 Sport</button>
+      <button class="nav-pill" data-section="environment">🌿 Environment</button>
+      <button class="nav-pill" data-section="travel">✈️ Travel</button>
+      <button class="nav-pill" data-section="food">🍽️ Food</button>
+      <button class="nav-pill" data-section="film">🎬 Film</button>
+      <button class="nav-pill" data-section="music">🎵 Music</button>
+      <button class="nav-pill" data-section="books">📚 Books</button>
+    </div>
+  </nav>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay hidden" id="settingsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button class="modal-close" id="closeSettings">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-info">
+          HappyNews uses <strong>The Guardian's free API</strong> to fetch positive stories from around the world.
+          The default <code>test</code> key works but has rate limits and no images.
+          Get a free key for the best experience:
+        </p>
+        <a class="modal-link" href="https://open-platform.theguardian.com/access/support-the-guardian" target="_blank">
+          open-platform.theguardian.com →
+        </a>
+        <div class="input-group">
+          <label for="apiKeyInput">Guardian API Key</label>
+          <input type="text" id="apiKeyInput" placeholder="test">
+        </div>
+        <p class="modal-note">Your key is stored locally in your browser and never sent anywhere except to The Guardian API.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" id="saveSettings">Save &amp; Reload</button>
+        <button class="btn-secondary" id="cancelSettings">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <main id="appMain">
+
+    <!-- ===== NEWS VIEW ===== -->
+    <div id="newsView">
+
+      <!-- Happiness Banner -->
+      <div class="happiness-banner">
+        <div class="banner-inner">
+          <span class="banner-emoji" id="moodEmoji">🌟</span>
+          <div>
+            <div class="banner-title">Today's Happy News</div>
+            <div class="banner-sub" id="articleCount">Finding positive stories from around the world…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Skeletons -->
+      <div id="loadingState">
+        <div class="skeleton-featured"></div>
+        <div class="skeleton-grid">
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div id="errorState" class="error-box hidden">
+        <div class="error-emoji">😅</div>
+        <h2>Couldn't load happy news</h2>
+        <p id="errorMsg">Check your API key in Settings and try again.</p>
+        <button class="btn-primary" id="retryBtn">Try Again</button>
+      </div>
+
+      <!-- News Content -->
+      <div id="newsContent" class="hidden">
+        <div id="featuredStory"></div>
+        <div class="content-layout">
+          <section class="news-main">
+            <div id="newsGrid" class="news-grid"></div>
+            <button class="load-more-btn hidden" id="loadMoreBtn">Load more happy news ↓</button>
+          </section>
+          <aside class="news-sidebar">
+            <div class="sidebar-widget">
+              <h3 class="widget-title">🌍 Around the World</h3>
+              <div id="worldHighlights"></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+    </div><!-- end #newsView -->
+
+    <!-- ===== MAP VIEW ===== -->
+    <div id="mapView" class="hidden">
+      <div class="map-wrapper">
+        <div id="map"></div>
+      </div>
+      <div class="map-panel" id="mapPanel">
+        <div class="map-panel-header">
+          <h3 id="mapPanelTitle">Click a marker to see news</h3>
+          <button class="panel-close hidden" id="closePanelBtn">✕</button>
+        </div>
+        <div id="mapNewsList">
+          <div class="map-empty">
+            <div class="map-empty-icon">🗺️</div>
+            <p>Markers show countries with happy news.<br>Click any marker to explore.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
