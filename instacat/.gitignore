@@ -1,0 +1,12 @@
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+backend/uploads/*
+!backend/uploads/.gitkeep
+backend/instacat.db
+backend/instacat.db-shm
+backend/instacat.db-wal
+frontend/build/
+.env
+.env.local
+*.log
