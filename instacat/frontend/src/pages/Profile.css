@@ -1,0 +1,134 @@
+.profile-page {
+  min-height: calc(100vh - var(--nav-height));
+  background: var(--bg);
+}
+
+.profile-loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+}
+
+/* Profile card */
+.profile-card {
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.profile-cover {
+  height: 120px;
+  background: linear-gradient(135deg, var(--primary) 0%, #ff9a9e 50%, var(--secondary) 100%);
+}
+
+.profile-body {
+  padding: 0 24px 24px;
+  position: relative;
+}
+
+.profile-avatar-wrap {
+  margin-top: -50px;
+  margin-bottom: 12px;
+}
+
+.profile-avatar-wrap .avatar {
+  border: 4px solid white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-info {
+  margin-bottom: 20px;
+}
+
+.profile-display-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.profile-username {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.profile-bio {
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+}
+
+.profile-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Stats */
+.profile-stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.stat-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Edit form */
+.edit-profile-form {
+  margin-top: 12px;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* Posts section */
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.profile-posts-list {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 600px) {
+  .profile-body {
+    padding: 0 16px 20px;
+  }
+
+  .profile-stats {
+    gap: 16px;
+  }
+}
