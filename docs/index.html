@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boozie Universe — The Daily Boozieverse Comic</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:ital,wght@0,400;0,700;1,400&family=Patrick+Hand&display=swap');
+
+    :root {
+      --cream: #FFF8F0;
+      --warm-orange: #FF8C42;
+      --deep-orange: #D45A00;
+      --boozie-brown: #8B7355;
+      --boozie-dark: #5C4A2A;
+      --accent-green: #4CAF50;
+      --panel-border: #1A1A1A;
+      --sky-blue: #87CEEB;
+      --text-dark: #1A1A1A;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: #1A1A1A;
+      background-image:
+        repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,140,66,0.03) 10px, rgba(255,140,66,0.03) 11px),
+        repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255,140,66,0.03) 10px, rgba(255,140,66,0.03) 11px);
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+      color: var(--text-dark);
+      min-height: 100vh;
+    }
+
+    /* ---- HEADER ---- */
+    header {
+      background: linear-gradient(135deg, #1A1A1A 0%, #2D1810 50%, #1A1A1A 100%);
+      border-bottom: 6px solid var(--warm-orange);
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-stars {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 40px 20px 30px;
+    }
+
+    .site-logo {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(3rem, 10vw, 7rem);
+      letter-spacing: 0.05em;
+      background: linear-gradient(180deg, #FFD700 0%, #FF8C42 50%, #FF4500 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      line-height: 0.9;
+      display: block;
+    }
+
+    .site-tagline {
+      font-family: 'Patrick Hand', cursive;
+      color: #FFD700;
+      font-size: 1.2rem;
+      margin-top: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .dwayne-badge {
+      display: inline-block;
+      background: var(--warm-orange);
+      color: white;
+      font-family: 'Bangers', cursive;
+      font-size: 1rem;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-top: 10px;
+      letter-spacing: 0.05em;
+      transform: rotate(-2deg);
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      border-top: 3px solid var(--warm-orange);
+      background: rgba(0,0,0,0.4);
+    }
+
+    nav a {
+      color: #FFD700;
+      text-decoration: none;
+      font-family: 'Bangers', cursive;
+      font-size: 1.2rem;
+      letter-spacing: 0.08em;
+      padding: 12px 24px;
+      border-right: 2px solid rgba(255,140,66,0.3);
+      transition: background 0.2s, color 0.2s;
+    }
+    nav a:hover, nav a.active {
+      background: var(--warm-orange);
+      color: white;
+    }
+
+    /* ---- MAIN LAYOUT ---- */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 16px;
+    }
+
+    /* ---- TODAY'S COMIC ---- */
+    .comic-section-label {
+      font-family: 'Bangers', cursive;
+      font-size: 1.5rem;
+      color: var(--warm-orange);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .comic-date-badge {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .comic-date-badge span {
+      display: inline-block;
+      background: #2D1810;
+      color: #FFD700;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 0.9rem;
+      padding: 4px 16px;
+      border-radius: 20px;
+      border: 2px solid var(--warm-orange);
+    }
+
+    /* ---- COMIC STRIP ---- */
+    .comic-strip {
+      background: white;
+      border: 5px solid var(--panel-border);
+      border-radius: 4px;
+      box-shadow: 8px 8px 0 rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+
+    .comic-title-bar {
+      background: var(--panel-border);
+      color: white;
+      font-family: 'Bangers', cursive;
+      font-size: 1.6rem;
+      letter-spacing: 0.06em;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .comic-issue {
+      font-family: 'Comic Neue', cursive;
+      font-size: 0.8rem;
+      color: #FFD700;
+      letter-spacing: 0.05em;
+    }
+
+    .comic-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+
+    .comic-panel {
+      border: 3px solid var(--panel-border);
+      position: relative;
+      background: white;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-caption {
+      background: rgba(255,255,255,0.95);
+      font-family: 'Patrick Hand', cursive;
+      font-size: 0.82rem;
+      font-style: italic;
+      padding: 5px 10px;
+      border-bottom: 2px solid var(--panel-border);
+      line-height: 1.3;
+      color: #333;
+    }
+
+    .panel-scene {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .panel-scene svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .panel-dialogue-area {
+      padding: 6px 10px;
+      border-top: 2px solid var(--panel-border);
+      background: white;
+    }
+
+    .speech-bubble {
+      position: relative;
+      background: white;
+      border: 2px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 5px 10px;
+      font-family: 'Comic Neue', cursive;
+      font-size: 0.78rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin: 3px 0;
+      display: inline-block;
+      max-width: 100%;
+    }
+
+    .speech-bubble.boozie {
+      background: #FFF8E7;
+      border-color: var(--boozie-brown);
+    }
+
+    .speech-bubble.donna {
+      background: #E7F3FF;
+      border-color: #5B8AC7;
+    }
+
+    .speech-bubble.street_cat {
+      background: #F0FFF0;
+      border-color: #4CAF50;
+    }
+
+    .speaker-label {
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #888;
+      display: block;
+      margin-bottom: 1px;
+    }
+
+    .panel-narration {
+      background: #FFFFE0;
+      border: 1.5px solid #CCC;
+      border-radius: 4px;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 0.75rem;
+      font-style: italic;
+      padding: 3px 8px;
+      margin-top: 4px;
+      color: #555;
+    }
+
+    /* ---- ARCHIVE ---- */
+    #archive-section {
+      display: none;
+    }
+
+    #archive-section.visible {
+      display: block;
+    }
+
+    .archive-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .archive-card {
+      background: white;
+      border: 4px solid var(--panel-border);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+
+    .archive-card:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 rgba(0,0,0,0.4);
+    }
+
+    .archive-card .card-thumb {
+      height: 140px;
+      overflow: hidden;
+      border-bottom: 3px solid var(--panel-border);
+    }
+
+    .archive-card .card-thumb svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .archive-card .card-info {
+      padding: 10px 12px;
+    }
+
+    .archive-card .card-title {
+      font-family: 'Bangers', cursive;
+      font-size: 1.1rem;
+      letter-spacing: 0.04em;
+      color: var(--panel-border);
+    }
+
+    .archive-card .card-issue {
+      font-size: 0.72rem;
+      color: #888;
+      margin-top: 2px;
+      font-family: 'Comic Neue', cursive;
+    }
+
+    /* ---- ABOUT SECTION ---- */
+    #about-section {
+      display: none;
+    }
+    #about-section.visible {
+      display: block;
+    }
+
+    .about-card {
+      background: white;
+      border: 5px solid var(--panel-border);
+      border-radius: 4px;
+      box-shadow: 8px 8px 0 rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+
+    .about-header {
+      background: var(--panel-border);
+      color: #FFD700;
+      font-family: 'Bangers', cursive;
+      font-size: 2rem;
+      letter-spacing: 0.08em;
+      padding: 14px 24px;
+    }
+
+    .about-body {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 0;
+    }
+
+    .about-portrait {
+      border-right: 4px solid var(--panel-border);
+      padding: 20px;
+      background: #FFF8F0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .about-portrait svg {
+      width: 120px;
+      height: 130px;
+    }
+
+    .about-portrait .name-plate {
+      font-family: 'Bangers', cursive;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      text-align: center;
+      color: var(--boozie-dark);
+      border: 2px solid var(--boozie-brown);
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: #FFF8E7;
+    }
+
+    .about-stats {
+      padding: 24px;
+    }
+
+    .stat-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+      align-items: flex-start;
+      border-bottom: 1px dashed #ddd;
+      padding-bottom: 12px;
+    }
+
+    .stat-label {
+      font-family: 'Bangers', cursive;
+      font-size: 0.9rem;
+      letter-spacing: 0.06em;
+      color: var(--warm-orange);
+      min-width: 110px;
+      padding-top: 2px;
+    }
+
+    .stat-value {
+      font-family: 'Comic Neue', cursive;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      color: #333;
+    }
+
+    /* ---- MODAL for archive comic ---- */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.open {
+      display: flex;
+    }
+    .modal-inner {
+      background: white;
+      border: 5px solid var(--panel-border);
+      border-radius: 4px;
+      max-width: 860px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 10px 10px 0 rgba(255,140,66,0.3);
+    }
+    .modal-close {
+      position: sticky;
+      top: 0;
+      background: var(--panel-border);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-family: 'Bangers', cursive;
+      font-size: 1rem;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      width: 100%;
+      text-align: right;
+      z-index: 10;
+    }
+    .modal-close:hover { background: #CC0000; }
+
+    /* ---- FOOTER ---- */
+    footer {
+      border-top: 4px solid var(--warm-orange);
+      background: #1A1A1A;
+      text-align: center;
+      padding: 24px;
+      color: #888;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 0.85rem;
+    }
+    footer strong {
+      color: var(--warm-orange);
+    }
+
+    /* ---- SECTION HEADINGS ---- */
+    .section-heading {
+      font-family: 'Bangers', cursive;
+      font-size: 2rem;
+      letter-spacing: 0.08em;
+      color: var(--warm-orange);
+      text-align: center;
+      margin-bottom: 24px;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .comic-panels {
+        grid-template-columns: 1fr;
+      }
+      .about-body {
+        grid-template-columns: 1fr;
+      }
+      .about-portrait {
+        border-right: none;
+        border-bottom: 4px solid var(--panel-border);
+        flex-direction: row;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <svg class="header-stars" viewBox="0 0 1200 200" preserveAspectRatio="xMidYMid slice">
+    <!-- decorative stars in header -->
+    <circle cx="50" cy="30" r="2" fill="#FFD700" opacity="0.6"/>
+    <circle cx="150" cy="80" r="1.5" fill="#FFD700" opacity="0.4"/>
+    <circle cx="250" cy="20" r="3" fill="#FFD700" opacity="0.5"/>
+    <circle cx="420" cy="60" r="2" fill="#FFD700" opacity="0.6"/>
+    <circle cx="600" cy="15" r="2.5" fill="#FFD700" opacity="0.5"/>
+    <circle cx="750" cy="70" r="1.5" fill="#FFD700" opacity="0.7"/>
+    <circle cx="900" cy="25" r="2" fill="#FFD700" opacity="0.4"/>
+    <circle cx="1050" cy="55" r="3" fill="#FFD700" opacity="0.5"/>
+    <circle cx="1150" cy="30" r="2" fill="#FFD700" opacity="0.6"/>
+    <circle cx="350" cy="100" r="1" fill="#FF8C42" opacity="0.5"/>
+    <circle cx="800" cy="110" r="1" fill="#FF8C42" opacity="0.5"/>
+    <!-- Paw print decorations -->
+    <g opacity="0.12" fill="#FF8C42">
+      <circle cx="100" cy="150" r="8"/>
+      <circle cx="115" cy="138" r="5"/>
+      <circle cx="126" cy="142" r="5"/>
+      <circle cx="122" cy="155" r="5"/>
+      <circle cx="108" cy="160" r="5"/>
+    </g>
+    <g opacity="0.12" fill="#FF8C42">
+      <circle cx="1100" cy="150" r="8"/>
+      <circle cx="1115" cy="138" r="5"/>
+      <circle cx="1126" cy="142" r="5"/>
+      <circle cx="1122" cy="155" r="5"/>
+      <circle cx="1108" cy="160" r="5"/>
+    </g>
+  </svg>
+  <div class="header-content">
+    <span class="site-logo">BOOZIE UNIVERSE</span>
+    <div class="site-tagline">The Daily Adventures of Dwayne "The Cat" Johnson</div>
+    <div class="dwayne-badge">★ Maine Coon ★ Cairo Born ★ Seattle Resident ★</div>
+  </div>
+  <nav>
+    <a href="#" class="active" onclick="showSection('today', this)">Today's Comic</a>
+    <a href="#" onclick="showSection('archive', this)">Archive</a>
+    <a href="#" onclick="showSection('about', this)">About Boozie</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- TODAY'S COMIC SECTION -->
+  <section id="today-section">
+    <div class="comic-section-label" id="today-label">Today's Episode</div>
+    <div class="comic-date-badge"><span id="today-date-display"></span></div>
+    <div id="comic-container"></div>
+  </section>
+
+  <!-- ARCHIVE SECTION -->
+  <section id="archive-section">
+    <h2 class="section-heading">The Boozie Archive</h2>
+    <div class="archive-grid" id="archive-grid"></div>
+  </section>
+
+  <!-- ABOUT SECTION -->
+  <section id="about-section">
+    <h2 class="section-heading">Who is The Boozie?</h2>
+    <div class="about-card">
+      <div class="about-header">Dwayne "The Cat" Johnson — aka BOOZIE</div>
+      <div class="about-body">
+        <div class="about-portrait">
+          <div id="about-portrait-svg"></div>
+          <div class="name-plate">BOOZIE<br>The Booziest</div>
+        </div>
+        <div class="about-stats">
+          <div class="stat-row">
+            <div class="stat-label">Full Name</div>
+            <div class="stat-value">Dwayne "The Cat" Johnson</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Alias</div>
+            <div class="stat-value">Boozie. The Boozie. The Booziest Boozie of the Entire Boozie Universe.</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Breed</div>
+            <div class="stat-value">Maine Coon (majestic, enormous, very opinionated)</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Origin Story</div>
+            <div class="stat-value">Born on the streets of Cairo, Egypt. Self-made. A street cat with the bearing of royalty.</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">How He Met Donna</div>
+            <div class="stat-value">At 3 months old, in the courtyard of the American University in Cairo dorms, Zamalek. He allowed her to adopt him.</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">The Great Migration</div>
+            <div class="stat-value">Age 1: flew from Cairo to Washington DC in a cat carrier. He was NOT pleased, but he did it with dignity.</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">DC Chapter</div>
+            <div class="stat-value">Two years in Washington DC. Surveillance of bunnies. Establishment of territorial claims.</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Current Base</div>
+            <div class="stat-value">Seattle, WA. Second floor window with prime bunny-watching vantage point.</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Interests</div>
+            <div class="stat-value">Window surveillance, bunny observation, judging street cats, loud noises (strongly opposed), napping, breakfast at unreasonable hours, sitting on things.</div>
+          </div>
+          <div class="stat-row" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+            <div class="stat-label">Donna Says</div>
+            <div class="stat-value"><em>"He's the booziest Boozie of the entire Boozie Universe."</em></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal-inner" id="modal-inner">
+    <button class="modal-close" onclick="closeModal()">✕ CLOSE</button>
+    <div id="modal-comic-container"></div>
+  </div>
+</div>
+
+<footer>
+  <strong>Boozie Universe</strong> — chronicling the inner life of Dwayne "The Cat" Johnson since 2026.<br>
+  Donna's words: <em>"He's the booziest Boozie of the entire Boozie Universe."</em><br>
+  He would agree.
+</footer>
+
+<script src="comics-data.js"></script>
+<script src="comic-renderer.js"></script>
+<script>
+  // --- NAV ---
+  function showSection(name, link) {
+    ['today','archive','about'].forEach(s => {
+      document.getElementById(s + '-section').classList.toggle('visible', s === name || s === 'today' && name === 'today');
+      document.getElementById(s + '-section').style.display = (s === name) ? 'block' : 'none';
+    });
+    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+    if (link) link.classList.add('active');
+  }
+
+  // --- RENDER COMIC ---
+  function buildComicHTML(comic) {
+    const panelCount = comic.panels.length;
+    let panelsHTML = '';
+    comic.panels.forEach((panel, i) => {
+      const svgContent = renderScene(panel.scene);
+      let dialogHTML = '';
+      if (panel.dialogue && panel.dialogue.length > 0) {
+        panel.dialogue.forEach(d => {
+          const speakerNames = { boozie: 'Boozie', donna: 'Donna', street_cat: 'Street Cat' };
+          dialogHTML += `<div class="speech-bubble ${d.speaker}">
+            <span class="speaker-label">${speakerNames[d.speaker] || d.speaker}</span>
+            ${d.text}
+          </div>`;
+        });
+      }
+      let narrationHTML = '';
+      if (panel.narration) {
+        narrationHTML = `<div class="panel-narration">${panel.narration}</div>`;
+      }
+      panelsHTML += `
+        <div class="comic-panel">
+          ${panel.caption ? `<div class="panel-caption">${panel.caption}</div>` : ''}
+          <div class="panel-scene">${svgContent}</div>
+          <div class="panel-dialogue-area">${dialogHTML}${narrationHTML}</div>
+        </div>`;
+    });
+
+    return `
+      <div class="comic-strip">
+        <div class="comic-title-bar">
+          <span>${comic.title}</span>
+          <span class="comic-issue">Episode #${comic.id} · Boozie Universe</span>
+        </div>
+        <div class="comic-panels">${panelsHTML}</div>
+      </div>`;
+  }
+
+  // --- TODAY'S COMIC ---
+  function loadToday() {
+    const comic = getTodaysComic();
+    document.getElementById('comic-container').innerHTML = buildComicHTML(comic);
+    const today = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('today-date-display').textContent = today.toLocaleDateString('en-US', options);
+    document.getElementById('today-label').textContent = 'Today\'s Episode';
+  }
+
+  // --- ARCHIVE ---
+  function loadArchive() {
+    const all = getAllComics();
+    const grid = document.getElementById('archive-grid');
+    grid.innerHTML = '';
+    all.forEach(comic => {
+      const thumbSvg = renderScene(comic.panels[0].scene, 260, 140);
+      const card = document.createElement('div');
+      card.className = 'archive-card';
+      card.innerHTML = `
+        <div class="card-thumb">${thumbSvg}</div>
+        <div class="card-info">
+          <div class="card-title">${comic.title}</div>
+          <div class="card-issue">Episode #${comic.id}</div>
+        </div>`;
+      card.addEventListener('click', () => openModal(comic));
+      grid.appendChild(card);
+    });
+  }
+
+  // --- ABOUT PORTRAIT ---
+  function loadAbout() {
+    const svg = renderScene('boozie_content', 120, 130);
+    document.getElementById('about-portrait-svg').innerHTML = svg;
+  }
+
+  // --- MODAL ---
+  function openModal(comic) {
+    document.getElementById('modal-comic-container').innerHTML = buildComicHTML(comic);
+    document.getElementById('modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(e) {
+    if (!e || e.target === document.getElementById('modal-overlay') || e.target.classList.contains('modal-close')) {
+      document.getElementById('modal-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  }
+
+  // --- INIT ---
+  // Default: show today
+  document.getElementById('archive-section').style.display = 'none';
+  document.getElementById('about-section').style.display = 'none';
+  loadToday();
+  loadArchive();
+  loadAbout();
+</script>
+</body>
+</html>
