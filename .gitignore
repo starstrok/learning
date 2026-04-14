@@ -1,0 +1,9 @@
+# Private itinerary — never commit booking details to a public repo
+trip-cancellation-forecast/itinerary_private.py
+trip-cancellation-forecast/itinerary_config.py
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
