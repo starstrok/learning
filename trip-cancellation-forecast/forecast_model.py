@@ -4,17 +4,24 @@ Trip Cancellation Risk Forecast Model
 Four-leg European summer trip — fuel/geopolitical disruption analysis.
 Itinerary details are stored in itinerary_private.py (gitignored).
 
-Model Last Updated: April 12, 2026
+Model Last Updated: April 23, 2026
 
 ─── CHANGELOG ──────────────────────────────────────────────────────────────
 v1  Apr  8: Initial model. Ceasefire announced; oil -15% to ~$95.
             Scenario C (breakdown) at 45%. Overall trip risk: 31.9%.
 
-v2  Apr 12: Pakistan peace talks FAILED after 21+ hrs. Trump ordered
-            US Naval blockade of Hormuz. Oil +7% to ~$101. Lufthansa
-            pilot strike Apr 13-14 (80-90% flights grounded). Added
-            charter/leisure leg type for Lufthansa Group leisure arm.
-            Scenario C raised to 65%. Overall trip risk: 53.4%.
+v2  Apr 12: Pakistan peace talks FAILED. US Naval blockade ordered.
+            Oil +7% to ~$101. LH pilot strike Apr 13-14. Scenario C
+            raised to 65%. Overall trip risk: 53.4%.
+
+v3  Apr 23: Trump extended ceasefire on Apr 22 (not collapsed).
+            Iran seized 2 ships anyway — Hormuz still effectively
+            closed (3 transits Apr 19). Oil $103. Jet fuel up 106%
+            YoY to $188/barrel. Lufthansa Group cancels 20,000
+            short-haul flights through Oct (120/day, full list due
+            late Apr/May). LH+EW pilot strike Apr 16-17. Scenario B
+            (frozen war) raised to 40%; C lowered to 45%.
+            Overall trip risk: 55.1%.
 ─────────────────────────────────────────────────────────────────────────────
 NOTE: No itinerary details (routes, airports, dates, flight numbers) are
 stored in this file. See itinerary_private.py (gitignored) for booking info.
@@ -29,34 +36,39 @@ import matplotlib.patches as mpatches
 import numpy as np
 
 # ─────────────────────────────────────────────────────────────
-# MARKET DATA (updated April 12, 2026)
+# MARKET DATA (updated April 23, 2026)
 # ─────────────────────────────────────────────────────────────
 
 OIL_DATA = {
-    "pre_war_brent":      67,    # $/barrel — Feb 2026 baseline
-    "peak_brent":        126,    # $/barrel — pre-ceasefire peak
-    "ceasefire_low":      94,    # $/barrel — Apr 8 post-ceasefire dip
-    "current_brent":     101,    # $/barrel — Apr 12 after blockade +7%
-    "kerosene_pre_war":  0.50,   # $/liter
-    "kerosene_current":  1.25,   # $/liter
+    "pre_war_brent":        67,    # $/barrel — Feb 2026 baseline
+    "peak_brent":          126,    # $/barrel — pre-ceasefire peak
+    "ceasefire_low":        94,    # $/barrel — Apr 8 post-ceasefire dip
+    "current_brent":       103,    # $/barrel — Apr 23
+    "jet_fuel_barrel":     188,    # $/barrel jet fuel — up 106.5% YoY
+    "kerosene_pre_war":   0.50,    # $/liter
+    "kerosene_current":   1.30,    # $/liter (up from $1.25)
 }
 
 PREDICTION_MARKETS = {
-    # Polymarket estimates — adjusted post-failed Pakistan talks (Apr 12)
-    "ceasefire_deal_by_june":  0.28,   # down from 51.5% pre-talks
-    "oil_hits_130_by_june":    0.68,   # up from 57% pre-talks
-    "ceasefire_by_year_end":   0.70,
+    # Estimates adjusted post-ceasefire-extension (Apr 23)
+    "ceasefire_deal_by_june":  0.32,   # slight uptick — extension buys time
+    "oil_hits_130_by_june":    0.61,   # down from 68% — war not resumed yet
+    "ceasefire_by_year_end":   0.72,
 }
 
 AIRLINE_DATA = {
-    "lh_fuel_hedged_pct":        0.80,   # 80% of 2026 fuel at pre-war prices
-    "lh_capacity_cut_eval_pct":  0.05,   # evaluating 5% cut (~40 aircraft)
-    "lh_new_hedging_suspended":  True,
-    "lh_cabin_crew_strike_apr10": True,
-    "lh_pilot_strike_apr13_14":   True,  # 80-90% cancellations expected
+    "lh_fuel_hedged_pct":           0.80,   # 80% of 2026 fuel at pre-war prices
+    "lh_flights_cancelled":        20_000,  # NEW: LH Group cancels 20k short-haul through Oct
+    "lh_daily_cancellations":         120,  # 120/day through end of May
+    "lh_new_hedging_suspended":      True,
+    "lh_cabin_crew_strike_apr10":    True,
+    "lh_pilot_strike_apr13_14":      True,
+    "lh_ew_pilot_strike_apr16_17":   True,  # NEW: Eurowings also struck Apr 16-17
+    "full_route_cut_list_due":    "Late April / Early May 2026",
     "kerosene_pct_of_eu_from_gulf": 0.40,
-    "hormuz_vessels_stranded":    600,
-    "hormuz_daily_transits":        7,   # vs ~100 pre-war
+    "hormuz_vessels_stranded":        600,
+    "hormuz_daily_transits":            3,  # dropped to 3 on Apr 19 (was 7)
+    "iran_ships_seized_post_ext":       2,  # Iran seized 2 ships after ceasefire extended
 }
 
 # ─────────────────────────────────────────────────────────────
@@ -82,49 +94,49 @@ class Scenario:
 
 SCENARIOS = [
     Scenario(
-        name="Scenario A — Ceasefire extends to permanent deal",
+        name="Scenario A — Ceasefire leads to permanent deal",
         short="A: Deal",
-        probability=0.12,
-        brent_june=72,
-        kerosene_june=0.68,
-        lh_capacity_cut=0.00,
-        ew_capacity_cut=0.00,
-        charter_capacity_cut=0.00,
+        probability=0.15,   # up from 0.12 — extension buys negotiating time
+        brent_june=78,
+        kerosene_june=0.72,
+        lh_capacity_cut=0.02,   # some cuts already locked in
+        ew_capacity_cut=0.03,
+        charter_capacity_cut=0.02,
         fuel_rationing_risk=0.02,
-        lh_strike_risk=0.06,   # labor dispute independent of fuel
-        p_longhaul=0.07,
-        p_charter=0.04,
-        p_lcc=0.03,
+        lh_strike_risk=0.06,
+        p_longhaul=0.08,
+        p_charter=0.06,
+        p_lcc=0.05,
     ),
     Scenario(
-        name="Scenario B — Ceasefire quietly extended, war frozen",
+        name="Scenario B — Frozen ceasefire, no resolution",
         short="B: Frozen",
-        probability=0.23,
-        brent_june=101,
-        kerosene_june=1.10,
-        lh_capacity_cut=0.03,
-        ew_capacity_cut=0.06,
-        charter_capacity_cut=0.08,
-        fuel_rationing_risk=0.12,
-        lh_strike_risk=0.09,
-        p_longhaul=0.11,
-        p_charter=0.13,
-        p_lcc=0.10,
+        probability=0.40,   # up from 0.23 — this is essentially current reality
+        brent_june=105,
+        kerosene_june=1.30,
+        lh_capacity_cut=0.08,   # 20k cuts already announced
+        ew_capacity_cut=0.10,
+        charter_capacity_cut=0.12,
+        fuel_rationing_risk=0.20,
+        lh_strike_risk=0.11,
+        p_longhaul=0.13,
+        p_charter=0.22,   # short-haul leisure routes in cut zone
+        p_lcc=0.18,
     ),
     Scenario(
         name="Scenario C — Ceasefire collapses, active war resumes",
         short="C: War",
-        probability=0.65,
-        brent_june=124,
-        kerosene_june=1.55,
-        lh_capacity_cut=0.10,
-        ew_capacity_cut=0.18,
-        charter_capacity_cut=0.22,
-        fuel_rationing_risk=0.42,
-        lh_strike_risk=0.14,
-        p_longhaul=0.16,
-        p_charter=0.30,
-        p_lcc=0.28,
+        probability=0.45,   # down from 0.65 — extension reduces near-term risk
+        brent_june=126,
+        kerosene_june=1.60,
+        lh_capacity_cut=0.12,
+        ew_capacity_cut=0.20,
+        charter_capacity_cut=0.28,
+        fuel_rationing_risk=0.48,
+        lh_strike_risk=0.15,
+        p_longhaul=0.17,
+        p_charter=0.35,
+        p_lcc=0.31,
     ),
 ]
 
@@ -300,19 +312,23 @@ def make_chart(output_path="trip_risk_chart.png"):
 
 def run_report():
     print("=" * 68)
-    print("FLIGHT DISRUPTION RISK FORECAST  [v2 — April 12, 2026]")
+    print("FLIGHT DISRUPTION RISK FORECAST  [v3 — April 23, 2026]")
     print("Four-leg European summer trip")
     print("=" * 68)
 
-    print("\n[WHAT CHANGED SINCE APRIL 8]")
+    print("\n[WHAT CHANGED SINCE APRIL 12]")
     print("-" * 68)
     events = [
-        ("Apr 9-10", "Hormuz traffic barely moved — only 4-7 vessels/day (was ~100+)"),
-        ("Apr 10",   "Lufthansa cabin crew strike: ~580 flights canceled"),
-        ("Apr 11",   "Pilot union calls 2-day strike Apr 13-14 (80-90% cancellations)"),
-        ("Apr 12",   "US-Iran peace talks in Pakistan FAIL after 21+ hours"),
-        ("Apr 12",   "Trump orders US Navy blockade of Hormuz 'effective immediately'"),
-        ("Apr 12",   "Oil futures +7% on blockade news; Brent ~$101/barrel"),
+        ("Apr 13-14", "LH pilot strike: 80-90% of mainline flights canceled"),
+        ("Apr 16-17", "Second pilot strike — LH AND Eurowings both grounded"),
+        ("Apr 18",    "Iran re-closes Hormuz after US refuses to lift port blockade"),
+        ("Apr 19",    "Hormuz transits hit new low: 3 vessels (was 7, pre-war was 100+)"),
+        ("Apr 21",    "Jet fuel hits $188/barrel — up 106.5% year-over-year"),
+        ("Apr 22",    "Ceasefire deadline: Trump EXTENDS it (no collapse, but no deal)"),
+        ("Apr 22",    "Iran seizes 2 ships in Hormuz hours after extension announced"),
+        ("Apr 22",    "Lufthansa Group cancels 20,000 short-haul flights through Oct"),
+        ("Apr 22",    "120 daily LH Group cancellations — full route list due late Apr/May"),
+        ("Apr 23",    "Brent crude $103.38 — holding in ELEVATED band"),
     ]
     for date, note in events:
         print(f"  {date:<10} {note}")
@@ -368,12 +384,11 @@ def run_report():
         marker = "  ◄ YOU ARE HERE" if "100-115" in band else ""
         print(f"  Brent {band:<12}  [{level:<8}]  {note}{marker}")
 
-    print("\n[5] KEY DATES")
+    print("\n[5] KEY DATES AHEAD")
     print("-" * 68)
     dates = [
-        ("Apr 13-14",  "Lufthansa pilot strike — 80-90% of flights canceled"),
-        ("Apr 22",     "CEASEFIRE EXPIRES — single most important date for this trip"),
-        ("Late Apr",   "Will Iran accept blockade terms? New talks scheduled?"),
+        ("Late Apr",   "Lufthansa full 20,000-cut route list published — CHECK IT"),
+        ("Late Apr",   "Iran 3-5 day deadline to submit unified peace proposal"),
         ("May 1-15",   "Summer schedule lock-in window (Lufthansa Group)"),
         ("June 1",     "IATA summer peak — capacity effectively frozen"),
     ]
@@ -383,24 +398,26 @@ def run_report():
     print("\n[6] RECOMMENDATIONS")
     print("-" * 68)
     recs = [
-        "Get 'cancel for any reason' (CFAR) travel insurance immediately.",
-        "Leg 2 (charter/leisure) is highest-risk — identify alternate routing now.",
-        "Leg 2 fare is NON-REFUNDABLE — if airline cancels, EU261 applies (full refund).",
-        "April 22 is your decision checkpoint: if ceasefire collapses, escalate plan.",
-        "Monitor Lufthansa Group labor news — unresolved by May = elevated June risk.",
-        "Brent crossing $115 = time to seriously consider contingency options.",
-        "Call airline now if on non-flexible fares — may waive change fees during crisis.",
+        "URGENT: Check the Lufthansa Group full route cut list when published (late Apr).",
+        "Leg 2 (charter/leisure, short-haul) is in the exact category being cut — act now.",
+        "Leg 2 is NON-REFUNDABLE — if airline cancels, EU261/2004 applies (full refund).",
+        "Leg 3 (LCC, intra-EU) — Eurowings struck twice; check route status weekly.",
+        "Get 'cancel for any reason' (CFAR) travel insurance if not already done.",
+        "Iran has 3-5 days to submit peace proposal — watch late April closely.",
+        "Brent crossing $115 = seriously consider contingency options.",
+        "Call airlines now — many waiving change fees during the fuel crisis.",
     ]
     for i, r in enumerate(recs, 1):
         print(f"  {i}. {r}")
 
-    print("\n[SOURCES — April 9-12, 2026]")
+    print("\n[SOURCES — April 13-23, 2026]")
     print("-" * 68)
-    print("  Oil/blockade:  CNBC, Fortune, Bloomberg, CoinDesk (Apr 12)")
-    print("  Peace talks:   NBC News, Al Jazeera, Time, PBS, The National (Apr 12)")
-    print("  Hormuz:        CNN Business, CNBC, S&P Global/Kpler vessel counts")
-    print("  Airlines:      LoyaltyLobby, One Mile at a Time, Bloomberg, AeroTime")
-    print("  Pred. markets: Polymarket (adjusted post-failed-talks estimates)")
+    print("  Oil:           Oneindia, Fortune, Trading Economics (Apr 23)")
+    print("  Ceasefire:     CNN, Time, NBC News, CFR, CBS News (Apr 21-22)")
+    print("  Hormuz:        CNBC, Al Jazeera, NPR, Windward AI (Apr 18-22)")
+    print("  Airlines:      Euronews, Brussels Signal, Live & Let's Fly (Apr 22)")
+    print("  LH strikes:    Lufthansa Experts Irreg (Apr 16-17 announcement)")
+    print("  Fuel prices:   Economy Class & Beyond, Young Research (Apr 22)")
     print("=" * 68)
 
 
